@@ -5,13 +5,13 @@ class BootStrap {
 
     def init = { servletContext ->
 
-      ['Hungry', 'Beertime'].each {
-        def c = new Channel(title:it).save()
+      ['Beer-Time?', 'Smoking?', 'Coffee?', 'Hamburger?',  'Meeting?', 'Kicker?'].each {
+        def c = Channel.findOrSaveByTitle it
         println("channel $it: " + c.errors)
       }
 
-      ['elm', 'madhava'].each {
-        def u = new User(username:it).save()
+      ['elm', 'madhava', 'stavros'].each {
+        def u = User.findOrSaveByUsername it
         println("user $it: " +u.errors)
       }
 

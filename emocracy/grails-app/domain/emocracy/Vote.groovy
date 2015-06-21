@@ -4,6 +4,8 @@ import org.joda.time.LocalDateTime
 
 class Vote {
 
+
+
   User user
 
   LocalDateTime submitted
@@ -25,7 +27,7 @@ class Vote {
       user {
         eq 'id', uid
       }
-      gt 'submitted', new LocalDateTime().minusMinutes(5)
+      gt 'submitted', new LocalDateTime().minusMinutes(1)
     }
 
   }

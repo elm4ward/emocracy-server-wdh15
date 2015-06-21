@@ -18,14 +18,20 @@ class ChannelService {
     }
    */
   def getAll() {
-    int majoritySize = User.count / 2
-    def channels = Channel.list().collect { Channel channel ->
-      def limit = new LocalDateTime().minusMinutes(5)
+    int majoritySize = Math.ceil(User.count / 2)
+
+    println(" channels: " + Channel.list())
+
+    def channels = Channel.list().sort({
+      it.latestVoteTime ?: new LocalDateTime().minusMinutes(120)
+    }).reverse().collect { Channel channel ->
+      def limit = new LocalDateTime().minusMinutes(1)
       def recents = channel.votes.findAll { it.submitted.isAfter(limit) }
       def alive = recents?.size() > 0
       def yes = recents.findAll { it.answer == 1 }?.size()
       def no = recents.findAll { it.answer != 1 }?.size()
       def democracy = null
+      def timestamp = channel.latestVoteTime?.toDate()?.time
       if (yes >= majoritySize ){
         democracy = 1
       }
@@ -38,10 +44,14 @@ class ChannelService {
           yes      : yes,
           no       : no,
           alive    : alive ? 1 : 0,
-          democracy: democracy
+          democracy: democracy,
+          timestamp: timestamp
       ]
     }
-    println channels
+    channels.each {
+      println "${it.name}(${it.timestamp}): ${it.yes} : ${it.no}"
+    }
+
     channels
   }
 
@@ -54,9 +64,10 @@ class ChannelService {
     }
     vote = new Vote(submitted: new LocalDateTime(), answer:answer)
     vote.user = user
-    channel.addToVotes(vote)
+    vote.channel = channel
     vote.save()
     println(vote.errors)
+    channel.addToVotes(vote)
     channel.save()
     true
   }

@@ -1,5 +1,7 @@
 package emocracy
 
+import org.joda.time.LocalDateTime
+
 class Channel {
 
   String title
@@ -10,5 +12,8 @@ class Channel {
 
   }
 
+  LocalDateTime getLatestVoteTime(){
+    votes?.max { it?.submitted }?.submitted
+  }
 
 }
